@@ -10,7 +10,11 @@ class BlogsController < ApplicationController
     @blogs = Blog.search(params[:term]).published.default_order
   end
 
-  def show; end
+  def show
+    if @blog.secret? && @blog.user != current_user
+      redirect_to root_path, alert: 'このブログは秘密のブログで、書いた本人しか見ることができません。'
+    end
+  end
 
   def new
     @blog = Blog.new
