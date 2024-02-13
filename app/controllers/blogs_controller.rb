@@ -4,7 +4,6 @@ class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
   before_action :set_blog, only: %i[edit update destroy]
-  before_action :check_owner, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -47,16 +46,12 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    @blog = Blog.find(params[:id])
+    @blog = current_user.blogs.find(params[:id])
   end
 
   def blog_params
     permitted = %i[title content secret]
     permitted.push(:random_eyecatch) if current_user.premium
     params.require(:blog).permit(permitted)
-  end
-
-  def check_owner
-    redirect_to root_path, alert: 'Access denied.' unless @blog.user == current_user
   end
 end
