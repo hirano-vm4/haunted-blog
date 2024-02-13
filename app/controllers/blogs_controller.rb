@@ -3,7 +3,7 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
-  before_action :set_blog, only: %i[show edit update destroy]
+  before_action :set_blog, only: %i[edit update destroy]
   before_action :check_owner, only: %i[edit update destroy]
 
   def index
@@ -11,9 +11,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    if @blog.secret? && @blog.user != current_user
-      redirect_to root_path, alert: 'このブログは秘密のブログで、書いた本人しか見ることができません。'
-    end
+    @blog = Blog.published.or(Blog.where(user: current_user)).find(params[:id])
   end
 
   def new
