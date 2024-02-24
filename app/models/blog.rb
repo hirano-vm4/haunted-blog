@@ -15,15 +15,9 @@ class Blog < ApplicationRecord
 
   scope :default_order, -> { order(id: :desc) }
 
+  scope :for_user_or_published, ->(user) { where(user:).or(published) }
+
   def owned_by?(target_user)
     user == target_user
-  end
-
-  def self.for_user_or_published(user)
-    if user
-      where('user_id = :user_id OR secret = :secret', user_id: user.id, secret: false)
-    else
-      published
-    end
   end
 end
